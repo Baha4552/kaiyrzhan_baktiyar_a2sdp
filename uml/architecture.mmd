@@ -1,0 +1,72 @@
+classDiagram
+direction LR
+
+namespace FactoryMethod {
+  class RenderWorkflowCreator~F~ {
+    <<abstract>>
+    +factoryMethod()
+    +processWorkflow()
+  }
+  class WindowsRenderCreator
+  class LinuxRenderCreator
+  class MacRenderCreator
+  class AndroidRenderCreator
+  RenderWorkflowCreator <|-- WindowsRenderCreator
+  RenderWorkflowCreator <|-- LinuxRenderCreator
+  RenderWorkflowCreator <|-- MacRenderCreator
+  RenderWorkflowCreator <|-- AndroidRenderCreator
+}
+
+namespace Products {
+  class RenderPipeline~F~ {
+    <<interface>>
+  }
+  class AudioEngine~F~ {
+    <<interface>>
+  }
+  class InputController~F~ {
+    <<interface>>
+  }
+}
+
+namespace AbstractFactory {
+  class SystemFactory~F~ {
+    <<interface>>
+    +createRenderPipeline()
+    +createAudioEngine()
+    +createInputController()
+  }
+  class WindowsDirectXFactory
+  class LinuxVulkanFactory
+  class MacOSMetalFactory
+  class AndroidOpenGLESFactory
+  SystemFactory <|.. WindowsDirectXFactory
+  SystemFactory <|.. LinuxVulkanFactory
+  SystemFactory <|.. MacOSMetalFactory
+  SystemFactory <|.. AndroidOpenGLESFactory
+}
+
+namespace Business {
+  class GameSession~F~ {
+    +runInteractiveFrame()
+    +adaptQuality()
+    +createCheckpoint()
+  }
+}
+
+GameSession ..> SystemFactory : receives
+GameSession --> RenderPipeline
+GameSession --> AudioEngine
+GameSession --> InputController
+WindowsDirectXFactory ..> RenderPipeline : creates
+WindowsDirectXFactory ..> AudioEngine : creates
+WindowsDirectXFactory ..> InputController : creates
+LinuxVulkanFactory ..> RenderPipeline : creates
+LinuxVulkanFactory ..> AudioEngine : creates
+LinuxVulkanFactory ..> InputController : creates
+MacOSMetalFactory ..> RenderPipeline : creates
+MacOSMetalFactory ..> AudioEngine : creates
+MacOSMetalFactory ..> InputController : creates
+AndroidOpenGLESFactory ..> RenderPipeline : creates
+AndroidOpenGLESFactory ..> AudioEngine : creates
+AndroidOpenGLESFactory ..> InputController : creates

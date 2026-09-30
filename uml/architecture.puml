@@ -1,0 +1,84 @@
+@startuml
+title Cross-Platform Game Engine — Factory Method + Abstract Factory
+
+skinparam packageStyle rectangle
+
+package "Factory Method" {
+  abstract class RenderWorkflowCreator<F> {
+    # factoryMethod() : RenderPipeline<F>
+    + processWorkflow(frame, action, quality) : RenderResult
+  }
+  class WindowsRenderCreator
+  class LinuxRenderCreator
+  class MacRenderCreator
+  class AndroidRenderCreator
+  RenderWorkflowCreator <|-- WindowsRenderCreator
+  RenderWorkflowCreator <|-- LinuxRenderCreator
+  RenderWorkflowCreator <|-- MacRenderCreator
+  RenderWorkflowCreator <|-- AndroidRenderCreator
+}
+
+package "Products" {
+  interface RenderPipeline<F>
+  interface AudioEngine<F>
+  interface InputController<F>
+}
+
+package "Abstract Factory" {
+  interface SystemFactory<F> {
+    + createRenderPipeline()
+    + createAudioEngine()
+    + createInputController()
+  }
+  class WindowsDirectXFactory
+  class LinuxVulkanFactory
+  class MacOSMetalFactory
+  class AndroidOpenGLESFactory
+  SystemFactory <|.. WindowsDirectXFactory
+  SystemFactory <|.. LinuxVulkanFactory
+  SystemFactory <|.. MacOSMetalFactory
+  SystemFactory <|.. AndroidOpenGLESFactory
+}
+
+package "Business Client" {
+  class GameSession<F> {
+    - renderer : RenderPipeline<F>
+    - audio : AudioEngine<F>
+    - input : InputController<F>
+    + runInteractiveFrame()
+    + adaptQuality()
+    + createCheckpoint()
+  }
+}
+
+WindowsDirectXFactory ..> RenderPipeline
+WindowsDirectXFactory ..> AudioEngine
+WindowsDirectXFactory ..> InputController
+LinuxVulkanFactory ..> RenderPipeline
+LinuxVulkanFactory ..> AudioEngine
+LinuxVulkanFactory ..> InputController
+MacOSMetalFactory ..> RenderPipeline
+MacOSMetalFactory ..> AudioEngine
+MacOSMetalFactory ..> InputController
+AndroidOpenGLESFactory ..> RenderPipeline
+AndroidOpenGLESFactory ..> AudioEngine
+AndroidOpenGLESFactory ..> InputController
+
+GameSession ..> SystemFactory : creates related products
+GameSession --> RenderPipeline
+GameSession --> AudioEngine
+GameSession --> InputController
+
+note right of RenderWorkflowCreator
+  Factory Method boundary:
+  Creator owns workflow;
+  subclass supplies concrete product.
+end note
+
+note right of SystemFactory
+  Abstract Factory boundary:
+  one F type parameter binds
+  Render + Audio + Input
+  to the same product family.
+end note
+@enduml
